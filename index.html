@@ -13,6 +13,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- ===== GOOGLE ANALYTICS 4 ===== -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0F3LRN1D8Q"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-0F3LRN1D8Q');
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1149,6 +1158,33 @@
       a.addEventListener('click', e => {
         const t = document.querySelector(a.getAttribute('href'));
         if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      });
+    });
+
+    // ── GA4: RASTREAMENTO DE CLIQUES NOS CTAs ──
+    function trackCTA(label) {
+      if (typeof gtag === 'function') {
+        gtag('event', 'cta_click', { event_category: 'CTA', event_label: label });
+      }
+    }
+    const btnComprar = document.getElementById('btn-comprar');
+    if (btnComprar) btnComprar.addEventListener('click', () => trackCTA('comprar_pricing'));
+    document.querySelectorAll('.btn-primary').forEach(b => b.addEventListener('click', () => trackCTA('cta_hero_primary')));
+    document.querySelectorAll('.header-cta').forEach(b => b.addEventListener('click', () => trackCTA('cta_header')));
+
+    // ── GA4: SCROLL DEPTH ──
+    const scrollMilestones = { 25: false, 50: false, 75: false, 100: false };
+    window.addEventListener('scroll', () => {
+      const scrollPct = Math.round(
+        (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100
+      );
+      [25, 50, 75, 100].forEach(m => {
+        if (!scrollMilestones[m] && scrollPct >= m) {
+          scrollMilestones[m] = true;
+          if (typeof gtag === 'function') {
+            gtag('event', 'scroll_depth', { event_category: 'Engagement', event_label: m + '%', value: m });
+          }
+        }
       });
     });
   </script>
